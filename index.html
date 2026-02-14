@@ -4,116 +4,163 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Adam Service</title>
+
+    <!-- Three.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;800&family=Playfair+Display:ital@1&display=swap" rel="stylesheet">
-    
+
     <style>
         :root {
             --bg: #080808;
             --accent: #ffffff;
             --secondary: #6366f1;
-            --glass: rgba(255, 255, 255, 0.03);
             --border: rgba(255, 255, 255, 0.1);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none; }
-        body { background: var(--bg); color: var(--accent); font-family: 'Inter', sans-serif; overflow-x: hidden; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: none;
+        }
 
-        /* --- 3D Canvas Layer --- */
+        body {
+            background: var(--bg);
+            color: var(--accent);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Canvas */
         #three-canvas {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            inset: 0;
             z-index: 1;
-            pointer-events: none; /* Let clicks pass through to UI */
+            pointer-events: none;
         }
 
-        /* --- Custom Cursor --- */
+        /* Custom Cursor */
         #cursor {
-            width: 12px; height: 12px; background: #fff; border-radius: 50%;
-            position: fixed; pointer-events: none; z-index: 9999;
-            mix-blend-mode: difference; transition: transform 0.15s ease-out;
+            width: 12px;
+            height: 12px;
+            background: #fff;
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            mix-blend-mode: difference;
+            transition: transform 0.15s ease-out;
         }
 
-        /* --- Content Layout --- */
+        /* Navigation */
         nav {
-            position: fixed; width: 100%; padding: 2.5rem;
-            display: flex; justify-content: space-between; z-index: 100;
+            position: fixed;
+            width: 100%;
+            padding: 2.5rem;
+            display: flex;
+            justify-content: space-between;
+            z-index: 100;
         }
 
+        .logo {
+            font-weight: 800;
+            font-size: 1.2rem;
+        }
+
+        /* Sections */
         section {
-            position: relative; min-height: 100vh;
-            padding: 0 10%; display: flex; flex-direction: column;
-            justify-content: center; z-index: 2;
+            min-height: 100vh;
+            padding: 0 10%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            z-index: 2;
         }
 
         h1 {
             font-size: clamp(3.5rem, 12vw, 9rem);
-            font-weight: 800; line-height: 0.85; letter-spacing: -4px;
+            font-weight: 800;
+            line-height: 0.85;
+            letter-spacing: -4px;
         }
 
-        span.italic { font-family: 'Playfair Display', serif; font-style: italic; font-weight: 400; }
+        .italic {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-weight: 400;
+        }
 
-        /* --- Interactive Timeline --- */
+        .description {
+            margin-top: 2rem;
+            font-size: 1.1rem;
+            opacity: 0.6;
+            max-width: 500px;
+        }
+
+        /* Timeline */
         .timeline {
-            position: relative; max-width: 800px; margin-top: 4rem;
-            border-left: 1px solid var(--border); padding-left: 2rem;
+            max-width: 800px;
+            margin-top: 4rem;
+            border-left: 1px solid var(--border);
+            padding-left: 2rem;
         }
 
         .timeline-item {
-            margin-bottom: 4rem; opacity: 0; transform: translateX(-20px);
-            transition: all 0.8s ease;
+            margin-bottom: 4rem;
         }
 
-        .timeline-item.active { opacity: 1; transform: translateX(0); }
-
-        .timeline-item h3 { font-size: 1.8rem; color: var(--secondary); }
-
-        /* --- Project Cards --- */
-        .grid {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 3rem;
+        .timeline-item h3 {
+            font-size: 1.8rem;
+            color: var(--secondary);
         }
 
-        .card {
-            background: var(--glass); border: 1px solid var(--border);
-            height: 450px; border-radius: 30px; backdrop-filter: blur(10px);
-            padding: 3rem; display: flex; flex-direction: column; justify-content: flex-end;
-            transition: 0.5s cubic-bezier(0.2, 1, 0.3, 1);
+        /* Scroll Reveal */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: 1s ease;
         }
 
-        .card:hover { transform: translateY(-10px); background: rgba(255,255,255,0.06); }
-
-        .reveal { opacity: 0; transform: translateY(40px); transition: 1s all ease; }
-        .reveal.active { opacity: 1; transform: translateY(0); }
-
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
     </style>
 </head>
+
 <body>
 
     <div id="cursor"></div>
     <canvas id="three-canvas"></canvas>
 
     <nav>
-        <div style="font-weight: 800; font-size: 1.2rem;">AdamSnyder</div>
+        <div class="logo">AdamSnyder</div>
         <div>Pro Player</div>
     </nav>
 
     <section id="hero">
-        <h1 class="reveal">Free Fire<br> <span class="italic">Holic.</span></h1>
-        <p class="reveal" style="margin-top: 2rem; font-size: 1.1rem; opacity: 0.6; max-width: 500px;">
+        <h1 class="reveal">
+            Free Fire<br>
+            <span class="italic">Holic.</span>
+        </h1>
+
+        <p class="reveal description">
             Available for boosting services to help elevate your name in Free Fire.
         </p>
     </section>
 
     <section id="about">
-        <h2 class="reveal italic" style="font-size: 3rem;">The Journey</h2>
+        <h2 class="reveal italic">The Journey</h2>
+
         <div class="timeline">
             <div class="timeline-item reveal">
-                <h3> Beat Kamiel</h3>
+                <h3>Beat Kamiel</h3>
                 <p>In 2025, I defeated Kamiel with a score of 7–1.</p>
             </div>
+
             <div class="timeline-item reveal">
                 <h3>Beat Prime Anubis</h3>
                 <p>In 2024, I defeated Prime Anubis with a score of 7–3.</p>
@@ -121,78 +168,93 @@
         </div>
     </section>
 
-
     <script>
-        // --- 1. Three.js: Floating Glass Icosahedron ---
+        /* ===============================
+           Three.js Background
+        ============================== */
         const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('three-canvas'), alpha: true, antialias: true });
+        const camera = new THREE.PerspectiveCamera(
+            75,
+            window.innerWidth / window.innerHeight,
+            0.1,
+            1000
+        );
+
+        const renderer = new THREE.WebGLRenderer({
+            canvas: document.getElementById('three-canvas'),
+            alpha: true,
+            antialias: true
+        });
+
         renderer.setSize(window.innerWidth, window.innerHeight);
 
-        // Create Geometry
         const geometry = new THREE.IcosahedronGeometry(2, 0);
         const material = new THREE.MeshPhysicalMaterial({
             color: 0x6366f1,
             metalness: 0.1,
             roughness: 0.05,
-            transmission: 0.9, // Glass effect
+            transmission: 0.9,
             transparent: true,
             thickness: 0.5,
             wireframe: true
         });
+
         const mesh = new THREE.Mesh(geometry, material);
         scene.add(mesh);
 
-        // Lights
-        const pointLight = new THREE.PointLight(0xffffff, 1);
-        pointLight.position.set(5, 5, 5);
-        scene.add(pointLight);
         scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+
+        const light = new THREE.PointLight(0xffffff, 1);
+        light.position.set(5, 5, 5);
+        scene.add(light);
 
         camera.position.z = 5;
 
-        // Mouse interaction for 3D
-        let mouseX = 0, mouseY = 0;
-        document.addEventListener('mousemove', (e) => {
-            mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
-            mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
-        });
-
         function animate() {
             requestAnimationFrame(animate);
+
             mesh.rotation.x += 0.005;
             mesh.rotation.y += 0.005;
-            
-            // Subtle mesh movement following mouse
-            mesh.position.x += (mouseX - mesh.position.x) * 0.05;
-            mesh.position.y += (-mouseY - mesh.position.y) * 0.05;
 
             renderer.render(scene, camera);
         }
         animate();
 
-        // --- 2. Custom Cursor ---
+        /* ===============================
+           Custom Cursor
+        ============================== */
         const cursor = document.getElementById('cursor');
+
         document.addEventListener('mousemove', (e) => {
-            cursor.style.left = e.clientX + 'px';
-            cursor.style.top = e.clientY + 'px';
+            cursor.style.left = `${e.clientX}px`;
+            cursor.style.top = `${e.clientY}px`;
         });
 
-        // --- 3. Scroll Reveal ---
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) entry.target.classList.add('active');
-            });
-        }, { threshold: 0.1 });
+        /* ===============================
+           Scroll Reveal
+        ============================== */
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                    }
+                });
+            },
+            { threshold: 0.1 }
+        );
 
         document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
-        // Resize handling
+        /* ===============================
+           Resize Handler
+        ============================== */
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
     </script>
+
 </body>
 </html>
