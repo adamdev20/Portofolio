@@ -47,25 +47,6 @@ body {
     line-height: 1.6;
 }
 
-.hire-button {
-    display: inline-block;
-    padding: 12px 28px;
-    background-color: #2F80ED; /* Biru elegant */
-    color: white;
-    font-size: 16px;
-    font-weight: 500;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.25s ease;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-}
-
-.hire-button:hover {
-    background-color: #1366D6; /* Biru lebih gelap */
-    transform: translateY(-2px);
-    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2);
-}
-
 @media (max-width: 768px) {
 
     .nav {
@@ -95,4 +76,5 @@ body {
     }
 
 }
+
 
