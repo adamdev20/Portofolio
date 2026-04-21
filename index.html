@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aura | Modern Digital Experience</title>
+    <style>
+        /* === CSS VARIABLES === */
+        :root {
+            --bg-base: #050505;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-1: #6366f1; /* Indigo */
+            --accent-2: #ec4899; /* Pink */
+            --accent-3: #06b6d4; /* Cyan */
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --transition-smooth: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* === RESET & BASE === */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+
+        /* === DYNAMIC BACKGROUND === */
+        .bg-glow {
+            position: fixed;
+            width: 60vw;
+            height: 60vw;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--accent-1), transparent 60%);
+            opacity: 0.15;
+            filter: blur(100px);
+            z-index: -1;
+            top: -20vh;
+            left: -10vw;
+            animation: pulseGlow 15s infinite alternate linear;
+            pointer-events: none;
+        }
+        
+        .bg-glow-2 {
+            position: fixed;
+            width: 50vw;
+            height: 50vw;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--accent-3), transparent 60%);
+            opacity: 0.1;
+            filter: blur(100px);
+            z-index: -1;
+            bottom: -20vh;
+            right: -10vw;
+            animation: pulseGlow 20s infinite alternate-reverse linear;
+            pointer-events: none;
+        }
+
+        @keyframes pulseGlow {
+            0% { transform: scale(1) translate(0, 0); }
+            50% { transform: scale(1.2) translate(5vw, 5vh); }
+            100% { transform: scale(0.9) translate(-5vw, -5vh); }
+        }
+
+        /* === NAVIGATION === */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 1.5rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            background: rgba(5, 5, 5, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--glass-border);
+            transition: var(--transition-smooth);
+        }
+
+        nav.scrolled { padding: 1rem 5%; }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            background: linear-gradient(to right, var(--text-main), var(--text-muted));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+        }
+
+        .nav-links li a {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            transition: var(--transition-smooth);
+            position: relative;
+        }
+
+        .nav-links li a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 0;
+            background: linear-gradient(90deg, var(--accent-1), var(--accent-3));
+            transition: var(--transition-smooth);
+        }
+
+        .nav-links li a:hover { color: var(--text-main); }
+        .nav-links li a:hover::after { width: 100%; }
+
+        /* Mobile Menu Button */
+        .hamburger {
+            display: none;
+            cursor: pointer;
+            width: 30px;
+            height: 20px;
+            position: relative;
+            z-index: 1001;
+        }
+
+        .hamburger span {
+            display: block;
+            position: absolute;
+            height: 2px;
+            width: 100%;
+            background: var(--text-main);
+            border-radius: 2px;
+            transition: .25s ease-in-out;
+        }
+
+        .hamburger span:nth-child(1) { top: 0px; }
+        .hamburger span:nth-child(2) { top: 9px; }
+        .hamburger span:nth-child(3) { top: 18px; }
+        .hamburger.active span:nth-child(1) { top: 9px; transform: rotate(135deg); }
+        .hamburger.active span:nth-child(2) { opacity: 0; left: -60px; }
+        .hamburger.active span:nth-child(3) { top: 9px; transform: rotate(-135deg); }
+
+        /* === SECTIONS GENERAL === */
+        section {
+            padding: 8rem 5% 4rem;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 3rem;
+            background: linear-gradient(135deg, #fff 0%, #a1a1aa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            width: fit-content;
+        }
+
+        /* Scroll Reveal Utility */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+        }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        /* === HERO SECTION === */
+        #home {
+            align-items: flex-start;
+            text-align: left;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            font-size: 0.85rem;
+            color: var(--accent-3);
+            margin-bottom: 1.5rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .hero-title {
+            font-size: clamp(3rem, 6vw, 6rem);
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: -2px;
+            margin-bottom: 1.5rem;
+        }
+
+        .text-gradient {
+            background: linear-gradient(to right, var(--accent-1), var(--accent-2), var(--accent-3));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-size: 200% auto;
+            animation: shine 5s linear infinite;
+        }
+
+        @keyframes shine { to { background-position: 200% center; } }
+
+        .hero-desc {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin-bottom: 3rem;
+        }
+
+        /* Interactive CTA */
+        .cta-btn {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.2rem 2.5rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #fff;
+            background: linear-gradient(45deg, var(--accent-1), var(--accent-2));
+            border-radius: 3rem;
+            overflow: hidden;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            z-index: 1;
+        }
+
+        .cta-btn::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(45deg, var(--accent-2), var(--accent-3));
+            z-index: -1;
+            transition: opacity 0.5s ease;
+            opacity: 0;
+        }
+
+        .cta-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
+        }
+
+        .cta-btn:hover::before { opacity: 1; }
+
+        /* === FEATURES SECTION (3D TILT CARDS) === */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            perspective: 1000px;
+        }
+
+        .feature-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            padding: 3rem 2rem;
+            border-radius: 1.5rem;
+            transition: transform 0.1s;
+            transform-style: preserve-3d;
+            will-change: transform;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(800px circle at var(--mouse-x) var(--mouse-y), rgba(255,255,255,0.06), transparent 40%);
+            z-index: 0;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .feature-card:hover::before { opacity: 1; }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            display: inline-block;
+            transform: translateZ(30px); /* 3D pop */
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            transform: translateZ(20px);
+        }
+
+        .feature-card p {
+            color: var(--text-muted);
+            transform: translateZ(10px);
+        }
+
+        /* === PROJECTS SECTION === */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .project-card {
+            border-radius: 1.5rem;
+            overflow: hidden;
+            position: relative;
+            aspect-ratio: 16/9;
+            cursor: pointer;
+            group: hover;
+        }
+
+        .project-img {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, #1e1b4b, #312e81);
+            transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Abstract patterns for project placeholders */
+        .project-card:nth-child(2) .project-img { background: linear-gradient(45deg, #4c1d95, #831843); }
+        .project-card:nth-child(3) .project-img { background: linear-gradient(45deg, #064e3b, #0f766e); }
+
+        .project-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 2rem;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.4s ease;
+        }
+
+        .project-card:hover .project-img { transform: scale(1.05); }
+        .project-card:hover .project-overlay { opacity: 1; transform: translateY(0); }
+
+        .project-overlay h3 { font-size: 1.5rem; margin-bottom: 0.5rem; color: #fff; }
+        .project-overlay span { color: var(--accent-3); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; }
+
+        /* === CONTACT SECTION === */
+        .contact-wrapper {
+            display: flex;
+            gap: 4rem;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 2rem;
+            padding: 4rem;
+        }
+
+        .contact-info { flex: 1; }
+        .contact-info p { color: var(--text-muted); margin-bottom: 2rem; font-size: 1.1rem; }
+        
+        .contact-form { flex: 1; display: flex; flex-direction: column; gap: 1.5rem; }
+        
+        .input-group { position: relative; }
+        .input-group input, .input-group textarea {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--glass-border);
+            border-radius: 1rem;
+            color: #fff;
+            font-size: 1rem;
+            outline: none;
+            transition: var(--transition-smooth);
+        }
+        
+        .input-group textarea { resize: vertical; min-height: 150px; }
+        
+        .input-group input:focus, .input-group textarea:focus {
+            border-color: var(--accent-1);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        }
+
+        /* === RESPONSIVE DESIGN === */
+        @media (max-width: 900px) {
+            .contact-wrapper { flex-direction: column; padding: 2rem; }
+        }
+
+        @media (max-width: 768px) {
+            .hamburger { display: block; }
+            .nav-links {
+                position: fixed;
+                top: 0; left: 0; width: 100%; height: 100vh;
+                background: rgba(5, 5, 5, 0.98);
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                gap: 3rem;
+                transform: translateY(-100%);
+                transition: var(--transition-smooth);
+            }
+            .nav-links.active { transform: translateY(0); }
+            .nav-links li a { font-size: 1.5rem; }
+            section { padding: 6rem 5% 3rem; }
+            .hero-title { font-size: 3rem; }
+            .features-grid, .projects-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-glow"></div>
+    <div class="bg-glow-2"></div>
+
+    <nav id="navbar">
+        <a href="#home" class="logo">Aura.</a>
+        <ul class="nav-links">
+            <li><a href="#home">Home</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#features">Features</a></li>
+            <li><a href="#projects">Projects</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+        <div class="hamburger">
+            <span></span><span></span><span></span>
+        </div>
+    </nav>
+
+    <section id="home">
+        <div class="reveal">
+            <div class="hero-badge">Welcome to the future</div>
+            <h1 class="hero-title">Crafting digital <br> <span class="text-gradient">experiences</span> that live.</h1>
+            <p class="hero-desc">We build immersive, interactive, and high-performance web environments that captivate audiences and elevate brands beyond the generic.</p>
+            <button class="cta-btn" onclick="document.getElementById('projects').scrollIntoView()">Explore Our Work</button>
+        </div>
+    </section>
+
+    <section id="about">
+        <h2 class="section-title reveal">About Us</h2>
+        <div class="reveal" style="max-width: 800px; font-size: 1.2rem; color: var(--text-muted);">
+            <p style="margin-bottom: 1.5rem;">We are a collective of digital artisans, rejecting the template-driven web. We believe that a website shouldn't just be viewed; it should be felt and experienced.</p>
+            <p>By blending modern aesthetics with cutting-edge front-end interactions, we transform standard layouts into living ecosystems that respond directly to the user.</p>
+        </div>
+    </section>
+
+    <section id="features">
+        <h2 class="section-title reveal">Our Capabilities</h2>
+        <div class="features-grid">
+            <div class="feature-card reveal">
+                <span class="feature-icon">✨</span>
+                <h3>Fluid Animations</h3>
+                <p>Silky smooth transitions and micro-interactions that make your interface feel instantly responsive and organic.</p>
+            </div>
+            <div class="feature-card reveal" style="transition-delay: 0.1s;">
+                <span class="feature-icon">⚡</span>
+                <h3>High Performance</h3>
+                <p>Lightning-fast load times achieved through clean architecture, pure codebases, and zero-bloat philosophies.</p>
+            </div>
+            <div class="feature-card reveal" style="transition-delay: 0.2s;">
+                <span class="feature-icon">🎨</span>
+                <h3>Bespoke Design</h3>
+                <p>Unique visual languages tailored specifically to your brand, guaranteeing you stand out from the competition.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="projects">
+        <h2 class="section-title reveal">Selected Works</h2>
+        <div class="projects-grid">
+            <div class="project-card reveal">
+                <div class="project-img"></div>
+                <div class="project-overlay">
+                    <span>Fintech App</span>
+                    <h3>Nexus Banking</h3>
+                </div>
+            </div>
+            <div class="project-card reveal" style="transition-delay: 0.1s;">
+                <div class="project-img"></div>
+                <div class="project-overlay">
+                    <span>E-Commerce</span>
+                    <h3>Aura Fashion</h3>
+                </div>
+            </div>
+            <div class="project-card reveal" style="transition-delay: 0.2s;">
+                <div class="project-img"></div>
+                <div class="project-overlay">
+                    <span>Web3 Platform</span>
+                    <h3>Ethereal Space</h3>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact">
+        <h2 class="section-title reveal">Let's Connect</h2>
+        <div class="contact-wrapper reveal">
+            <div class="contact-info">
+                <h3 style="font-size: 2rem; margin-bottom: 1rem;">Start a Project</h3>
+                <p>Ready to build something extraordinary? Drop us a line and let's turn your vision into a digital reality.</p>
+                <div style="margin-top: 2rem;">
+                    <p><strong>Email:</strong> hello@aura-digital.io</p>
+                    <p><strong>Location:</strong> Creative District, NY</p>
+                </div>
+            </div>
+            <form class="contact-form" onsubmit="event.preventDefault(); alert('Message sent simulated!');">
+                <div class="input-group">
+                    <input type="text" placeholder="Your Name" required>
+                </div>
+                <div class="input-group">
+                    <input type="email" placeholder="Your Email" required>
+                </div>
+                <div class="input-group">
+                    <textarea placeholder="Tell us about your project" required></textarea>
+                </div>
+                <button type="submit" class="cta-btn" style="width: 100%;">Send Message</button>
+            </form>
+        </div>
+    </section>
+
+    <script>
+        // 1. Mobile Menu Toggle
+        const hamburger = document.querySelector('.hamburger');
+        const navLinks = document.querySelector('.nav-links');
+        const links = document.querySelectorAll('.nav-links li a');
+
+        hamburger.addEventListener('click', () => {
+            hamburger.classList.toggle('active');
+            navLinks.classList.toggle('active');
+        });
+
+        // Close mobile menu on link click
+        links.forEach(link => {
+            link.addEventListener('click', () => {
+                hamburger.classList.remove('active');
+                navLinks.classList.remove('active');
+            });
+        });
+
+        // 2. Navbar Scroll Effect
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // 3. Scroll Reveal Animations (Intersection Observer)
+        const revealElements = document.querySelectorAll('.reveal');
+        const revealOptions = {
+            threshold: 0.15,
+            rootMargin: "0px 0px -50px 0px"
+        };
+
+        const revealOnScroll = new IntersectionObserver(function(entries, observer) {
+            entries.forEach(entry => {
+                if (!entry.isIntersecting) return;
+                entry.target.classList.add('active');
+                observer.unobserve(entry.target); // Run once
+            });
+        }, revealOptions);
+
+        revealElements.forEach(el => revealOnScroll.observe(el));
+
+        // 4. Dynamic 3D Tilt Effect on Feature Cards
+        const cards = document.querySelectorAll('.feature-card');
+        
+        cards.forEach(card => {
+            // Track mouse for the glow effect
+            card.addEventListener('mousemove', e => {
+                const rect = card.getBoundingClientRect(),
+                      x = e.clientX - rect.left,
+                      y = e.clientY - rect.top;
+                
+                card.style.setProperty("--mouse-x", `${x}px`);
+                card.style.setProperty("--mouse-y", `${y}px`);
+                
+                // Calculate 3D tilt logic
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                
+                const rotateX = ((y - centerY) / centerY) * -10; // Max tilt 10deg
+                const rotateY = ((x - centerX) / centerX) * 10;
+                
+                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+            });
+            
+            // Reset on mouse leave
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+            });
+        });
+    </script>
+</body>
+</html>
